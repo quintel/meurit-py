@@ -1,0 +1,26 @@
+GIT
+  remote: https://github.com/quintel/merit.git
+  revision: 1ebfc82faebdb402d25ab2edb555d6b89fe44b90
+  ref: 1ebfc82
+  specs:
+    quintel_merit (0.1.0)
+      terminal-table
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    terminal-table (3.0.2)
+      unicode-display_width (>= 1.1.1, < 3)
+    unicode-display_width (2.1.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  quintel_merit!
+
+RUBY VERSION
+   ruby 2.5.1p57
+
+BUNDLED WITH
+   2.1.4

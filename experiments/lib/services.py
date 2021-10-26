@@ -53,8 +53,10 @@ class Scenario:
 
 
     def set_interconnector_capacity(self, index, capacity):
-        data = {'user_values': {f'electricity_interconnector_{index}_capacity': capacity}}
-        response = requests.put(self.base_url, data=data)
+        data = {'scenario': {
+            'user_values': {f'electricity_interconnector_{index}_capacity': capacity}
+        }}
+        response = requests.put(self.base_url, json=data)
 
         if response.ok: return
 
@@ -64,7 +66,7 @@ class Scenario:
         file = price_curve['Price (Euros)'].to_csv(index=False, header=False)
         data = {'file': ('mEUrit_curve.csv', file)}
         response = requests.put(
-            self.base_url + f'/custom_curves/interconnector_{index+1}_price',
+            self.base_url + f'/custom_curves/interconnector_{index}_price',
             files=data
         )
 

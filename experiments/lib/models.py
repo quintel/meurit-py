@@ -54,6 +54,7 @@ class Country:
             capacity (int): the capacity of the interconnector in MW
         '''
         self.interconnectors.add(Interconnector(self, other, capacity))
+        # Disable the interconnector in the ETM
         self.scenario.set_interconnector_capacity(len(self.interconnectors), 0)
 
 
@@ -80,7 +81,7 @@ class Country:
     def enable_interconnectors(self):
         '''TODO: set all of them in one call'''
         for index, interconnector in enumerate(self.interconnectors):
-            self.scenario.set_interconnector_capacity(index, interconnector.capacity)
+            self.scenario.set_interconnector_capacity(index+1, interconnector.capacity)
 
 
     def calculate(self):
@@ -93,7 +94,7 @@ class Country:
 
     def update(self):
         for index, interconnector in enumerate(self.interconnectors):
-            self.scenario.set_interconnector(index, interconnector.to_country.price_curve)
+            self.scenario.set_interconnector(index+1, interconnector.to_country.price_curve)
 
 
 class InterconnectorCollection:

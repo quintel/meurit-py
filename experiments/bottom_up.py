@@ -21,7 +21,7 @@ be.build_interconnector_to(nl, 3000)
 be.build_interconnector_to(de, 3000)
 
 # Let's call the ETM to calculate some price-curves and volumes for us
-iterations = 10
+iterations = 2
 
 logger = DataLogger(iterations, [nl, be, de])
 area.attach_logger(logger)
@@ -38,5 +38,4 @@ for i in range(1, iterations):
     area.calculate_all(iteration=i)
 
 print(logger.prices)
-print(logger.volumes)
 logger.plot()

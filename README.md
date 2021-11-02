@@ -12,3 +12,8 @@ For developing in python, use pipenv to install dependencies
 ```
 pipenv install --dev
 ```
+
+Or to combine both steps at once you can use
+```
+bin/setup
+```

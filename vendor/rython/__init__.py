@@ -265,7 +265,7 @@ class RubyContext(object):
                     end
 
                     def generate_ruby_context_address(obj)
-                        "ruby\##{obj.class.to_s}[#{obj.object_id}]"
+                        "ruby##{obj.class.to_s}[#{obj.object_id}]"
                     end
 
                     def add_proxy(ruby_context_address, proxy)
@@ -358,7 +358,7 @@ class RubyProxy(object):
             raise ValueError("cannot mix sequenced arguments with keyword arguments when calling to the Ruby context")
         if kwargs:
             transformed_kwargs = {}
-            for k,v in kwargs.iteritems():
+            for k,v in kwargs.items():
                 transformed_kwargs[k] = self.__transform_argument(v)
             substituted_code = code % transformed_kwargs
         else:

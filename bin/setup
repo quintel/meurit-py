@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+
+import subprocess
+import os
+
+# TODO: check if pipenv is installed already (pipenv --version)
+os.system('pip3 install pipenv')
+os.system('pipenv install --dev')
+
+check_ruby_version = subprocess.Popen(['ruby', '--version'], stdout=subprocess.PIPE, text=True)
+# TODO: parse ruby version from gemfile
+if not '2.5.1' in check_ruby_version.stdout.readline():
+    # TODO: make this more interactive - help the user install the correct version, via sys we
+    # can communicate with them
+    print('Ruby 2.5.1 is not installed, please install this version through a ruby version manager or conda')
+    # conda install -c anaconda ruby
+else:
+    subprocess.run(['bundle', 'install'])
+
+# Yay! Done!

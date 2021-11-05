@@ -1,4 +1,5 @@
 '''Neccesary models for bottom-up experiments'''
+import pandas as pd
 
 from lib.services import Scenario
 
@@ -37,10 +38,11 @@ class Area:
 
 
 class Country:
-    def __init__(self, name):
+    def __init__(self, name, create_scenario=True):
         self.name = name
         self.interconnectors = InterconnectorCollection()
-        self.scenario = Scenario.from_area_code(self.name)
+        # This is ugly but we need it for the subclass
+        self.scenario = Scenario.from_area_code(self.name) if create_scenario else None
         self.logger = None
 
 
@@ -57,6 +59,8 @@ class Country:
         # Disable the interconnector in the ETM
         self.scenario.set_interconnector_capacity(len(self.interconnectors), 0)
 
+        if not other.interconnector_to(self):
+            other.build_interconnector_to(self, capacity)
 
     def interconnector_to(self, country):
         '''
@@ -97,6 +101,55 @@ class Country:
             self.scenario.set_interconnector(index+1, interconnector.to_country.price_curve)
 
 
+class InactiveCountry(Country):
+    def __init__(self, name, price_curve):
+        '''Has a price_curve instead of a scenario! The curve should be 8670 long'''
+        super().__init__(name, create_scenario=False)
+        self.price_curve = price_curve
+        self.validate_curve()
+        self.merit_order = None
+
+
+    def validate_curve(self):
+        if not self.price_curve['Price (Euros)'].size == 8760:
+            print(f'Price curve for {self.name} should be 8760 long.')
+
+        # No negative prices please
+        self.price_curve[self.price_curve < 0] = 0
+
+
+    def build_interconnector_to(self, other, capacity):
+        '''
+        Add an interconnector to another country to the collection.
+
+        Params:
+            other (Country): the country to connect to
+            capacity (int): the capacity of the interconnector in MW
+        '''
+        self.interconnectors.add(Interconnector(self, other, capacity))
+
+        if not other.interconnector_to(self):
+            other.build_interconnector_to(self, capacity)
+
+
+    def update(self):
+        pass
+
+
+    def calculate(self):
+        pass
+
+    def enable_interconnectors(self):
+        pass
+
+    @classmethod
+    def from_price_curve_file(cls, name, price_curve_file):
+        # READ AS FLOAT
+        price_curve = pd.read_csv(price_curve_file, header=None, dtype='float64')
+        price_curve.columns = ['Price (Euros)']
+        return cls(name, price_curve)
+
+
 class InterconnectorCollection:
     def __init__(self):
         self.collection = []
@@ -115,7 +168,7 @@ class InterconnectorCollection:
             if interconnector.to_country == to_country:
                 return interconnector
 
-        raise NoInterconnectorDefined()
+        return None
 
 
 class Interconnector:
@@ -127,7 +180,7 @@ class Interconnector:
         self.capacity = capacity
 
 
-class NoInterconnectorDefined(BaseException):
-    def __init__(self):
-        self.message= 'No Interconnector was defined between countries'
+# class NoInterconnectorDefined(BaseException):
+#     def __init__(self):
+#         self.message= 'No Interconnector was defined between countries'
 

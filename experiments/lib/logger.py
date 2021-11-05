@@ -40,8 +40,14 @@ class DataLogger:
 
     def set_volumes(self, iteration, country):
         for index, connection in enumerate(country.interconnectors):
-            import_curve = country.merit_order[f'energy_interconnector_{index+1}_imported_electricity.output (MW)']
-            export_curve = country.merit_order[f'energy_interconnector_{index+1}_exported_electricity.input (MW)']
+            if country.merit_order is None:
+                # This happens for inactive countries
+                # TODO: just skip these values in filling in and in plotting
+                import_curve = np.zeros(2)
+                export_curve = np.zeros(2)
+            else:
+                import_curve = country.merit_order[f'energy_interconnector_{index+1}_imported_electricity.output (MW)']
+                export_curve = country.merit_order[f'energy_interconnector_{index+1}_exported_electricity.input (MW)']
             self.volumes.loc[iteration, (country.name, connection.to_country.name, 'export-mean')] = export_curve.mean()
             self.volumes.loc[iteration, (country.name, connection.to_country.name, 'export-min')] = export_curve.min()
             self.volumes.loc[iteration, (country.name, connection.to_country.name, 'export-max')] = export_curve.max()
@@ -56,7 +62,7 @@ class DataLogger:
 
 
     def plot_prices(self):
-        fig, axes = plt.subplots(nrows=1, ncols=self.country_len)
+        fig, axes = plt.subplots(nrows=1, ncols=self.country_len + 1)
 
         counter = 0
         for country, df in self.prices.groupby(level='country', axis=1):
@@ -74,7 +80,7 @@ class DataLogger:
 
 
     def plot_volumes(self):
-        fig, axes = plt.subplots(nrows=self.country_len, ncols=self.country_len-1)
+        fig, axes = plt.subplots(nrows=self.country_len + 1, ncols=self.country_len)
 
         self.volumes.drop('placeholder', axis=1, level=1, inplace=True)
 

@@ -1,6 +1,6 @@
 '''The bottom up experiment'''
 
-from lib.models import Country, Area
+from lib.models import Country, InactiveCountry, Area
 from lib.logger import DataLogger
 
 # Setup the coutries and put them in an Area for enabling 'all' methods
@@ -8,17 +8,17 @@ nl = Country('nl')
 de = Country('de')
 be = Country('be')
 
-area = Area(nl, be, de)
+# Add an inactive coutry
+dk = InactiveCountry.from_price_curve_file('dk', 'experiments/price_curves/curve.csv')
+
+area = Area(nl, be, de, dk)
 
 # Add interconnectors and capacities
 nl.build_interconnector_to(de, 3000)
 nl.build_interconnector_to(be, 3000)
-
-de.build_interconnector_to(nl, 3000)
 de.build_interconnector_to(be, 3000)
+de.build_interconnector_to(dk, 3000) # Static interconnector
 
-be.build_interconnector_to(nl, 3000)
-be.build_interconnector_to(de, 3000)
 
 # Let's call the ETM to calculate some price-curves and volumes for us
 iterations = 2

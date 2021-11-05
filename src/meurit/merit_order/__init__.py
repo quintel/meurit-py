@@ -1,4 +1,5 @@
 import vendor.rython as rython
+from meurit.merit_order.builder import MeritOrderBuilder
 
 merit_context = rython.RubyContext(requires=['bundler/setup', "quintel_merit"], debug=True)
 
@@ -43,6 +44,20 @@ class MeritOrder:
     def price_curve(self):
         '''Returns the price curve'''
         return self.merit_order('price_curve')('to_a')
+
+
+    @classmethod
+    def from_source(cls, source):
+        '''
+        Creates and builds a MeritOrder based on the supplied source
+
+        Params:
+            source(Source): The source for the MeritOrder
+        '''
+        mo = cls()
+        MeritOrderBuilder(mo, source).build_from_source()
+
+        return mo
 
 
 # Helper functions -------------------------------------------------------------

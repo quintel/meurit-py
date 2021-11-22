@@ -25,25 +25,25 @@ oth = InactiveCountry.from_price_curve_file('oth' ,path / 'vertrouwelijk - oth 2
 area = Area(nl, be, de, dk, at, fr, no, se, uk, lu, ch, oth)
 
 # Add interconnectors and capacities
-be.build_interconnector_to(lu, 680, 100.0)    # static
-be.build_interconnector_to(fr, 1800, 100.0)   # static
-be.build_interconnector_to(nl, 2400, 100.0)   # dynamic
+be.build_interconnector_to(lu, 680, 0.26, 100.0)     # static
+be.build_interconnector_to(fr, 3300, 100.0, 0.55)    # static
+be.build_interconnector_to(nl, 2400, 0.58, 100.0)    # dynamic
 
-de.build_interconnector_to(oth, 7815, 100.0) # static
-de.build_interconnector_to(fr, 2300, 100.0)   # static
-de.build_interconnector_to(dk, 2500, 100.0)   # dynamic
-de.build_interconnector_to(ch, 2700, 100.0)   # static
-de.build_interconnector_to(nl, 4250, 100.0)   # dynamic
-de.build_interconnector_to(at, 5400, 100.0)   # static
+de.build_interconnector_to(oth, 7815, 100.0, 100.0)  # static
+de.build_interconnector_to(fr, 2300, 0.78, 100.0)    # static
+de.build_interconnector_to(dk, 2765, 0.78, 100.0)    # dynamic
+de.build_interconnector_to(ch, 4600, 0.59, 100.0)    # static
+de.build_interconnector_to(nl, 4250, 100.0, 100.0)   # dynamic
+de.build_interconnector_to(at, 5400, 100.0, 100.0)   # static
 
-nl.build_interconnector_to(no, 700, 100.0)    # static
-nl.build_interconnector_to(uk, 1000, 100.0)   # static
-nl.build_interconnector_to(be, 1400, 100.0)   # dynamic
-nl.build_interconnector_to(de, 4250, 100.0)   # dynamic
+nl.build_interconnector_to(no, 700, 100.0, 100.0)    # static
+nl.build_interconnector_to(uk, 1000, 100.0, 100.0)   # static
+nl.build_interconnector_to(be, 2400, 100.0, 0.58)    # dynamic
+nl.build_interconnector_to(de, 4250, 100.0, 100.0)   # dynamic
 
-dk.build_interconnector_to(no, 1640, 100.0)
-dk.build_interconnector_to(se, 2440, 100.0)
-dk.build_interconnector_to(de, 2765, 100.0)
+dk.build_interconnector_to(no, 1640, 100.0, 100.0)   # static
+dk.build_interconnector_to(se, 2440, 0.81, 100.0)    # static
+dk.build_interconnector_to(de, 2765, 100.0, 0.90)    # dynamic
 
 # Let's call the ETM to calculate some price-curves and volumes for us
 iterations = 2

@@ -25,25 +25,25 @@ oth = InactiveCountry.from_price_curve_file('oth' ,path / 'vertrouwelijk - oth 2
 area = Area(nl, be, de, dk, at, fr, no, se, uk, lu, ch, oth)
 
 # Add interconnectors and capacities
-be.build_interconnector_to(lu, 680, 0.26, 100.0)     # static
-be.build_interconnector_to(fr, 3300, 100.0, 0.55)    # static
-be.build_interconnector_to(nl, 2400, 0.58, 100.0)    # dynamic
+be.build_interconnector_to(lu, 680, import_availability=26.0)     # static
+be.build_interconnector_to(fr, 3300, export_availability=55.0)    # static
+be.build_interconnector_to(nl, 2400, import_availability=58.0)    # dynamic
 
-de.build_interconnector_to(oth, 7815, 100.0, 100.0)  # static
-de.build_interconnector_to(fr, 2300, 0.78, 100.0)    # static
-de.build_interconnector_to(dk, 2765, 0.90, 100.0)    # dynamic
-de.build_interconnector_to(ch, 4600, 0.59, 100.0)    # static
-de.build_interconnector_to(nl, 4250, 100.0, 100.0)   # dynamic
-de.build_interconnector_to(at, 5400, 100.0, 100.0)   # static
+de.build_interconnector_to(oth, 7815)                             # static
+de.build_interconnector_to(fr, 2300, import_availability=78.0)    # static
+de.build_interconnector_to(dk, 2765, import_availability=90.0)    # dynamic
+de.build_interconnector_to(ch, 4600, import_availability=59.0)    # static
+de.build_interconnector_to(nl, 4250)                              # dynamic
+de.build_interconnector_to(at, 5400)                              # static
 
-nl.build_interconnector_to(no, 700, 100.0, 100.0)    # static
-nl.build_interconnector_to(uk, 1000, 100.0, 100.0)   # static
-nl.build_interconnector_to(be, 2400, 100.0, 0.58)    # dynamic
-nl.build_interconnector_to(de, 4250, 100.0, 100.0)   # dynamic
+nl.build_interconnector_to(no, 700)                               # static
+nl.build_interconnector_to(uk, 1000)                              # static
+nl.build_interconnector_to(be, 2400, export_availability=58.0)    # dynamic
+nl.build_interconnector_to(de, 4250)                              # dynamic
 
-dk.build_interconnector_to(no, 1640, 100.0, 100.0)   # static
-dk.build_interconnector_to(se, 2440, 0.81, 100.0)    # static
-dk.build_interconnector_to(de, 2765, 100.0, 0.90)    # dynamic
+dk.build_interconnector_to(no, 1640)                              # static
+dk.build_interconnector_to(se, 2440, import_availability=81.0)    # static
+dk.build_interconnector_to(de, 2765, export_availability=90.0)    # dynamic
 
 # Let's call the ETM to calculate some price-curves and volumes for us
 iterations = 2

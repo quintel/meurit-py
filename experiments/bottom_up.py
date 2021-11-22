@@ -26,12 +26,10 @@ area = Area(nl, be, de, dk, at, fr, no, se, uk, lu, ch, oth)
 
 # Add interconnectors and capacities
 be.build_interconnector_to(lu, 680)    # static
-be.build_interconnector_to(de, 1000)   # dynamic
 be.build_interconnector_to(fr, 1800)   # static
 be.build_interconnector_to(nl, 2400)   # dynamic
 
 de.build_interconnector_to(oth, 10115) # static
-de.build_interconnector_to(be, 1000)   # dynamic
 de.build_interconnector_to(dk, 2500)   # dynamic
 de.build_interconnector_to(ch, 2700)   # static
 de.build_interconnector_to(nl, 4250)   # dynamic

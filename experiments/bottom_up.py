@@ -25,25 +25,25 @@ oth = InactiveCountry.from_price_curve_file('oth' ,path / 'vertrouwelijk - oth 2
 area = Area(nl, be, de, dk, at, fr, no, se, uk, lu, ch, oth)
 
 # Add interconnectors and capacities
-be.build_interconnector_to(lu, 680)    # static
-be.build_interconnector_to(fr, 1800)   # static
-be.build_interconnector_to(nl, 2400)   # dynamic
+be.build_interconnector_to(lu, 680, 100.0)    # static
+be.build_interconnector_to(fr, 1800, 100.0)   # static
+be.build_interconnector_to(nl, 2400, 100.0)   # dynamic
 
-de.build_interconnector_to(oth, 7815) # static
-de.build_interconnector_to(fr, 2300)   # static
-de.build_interconnector_to(dk, 2500)   # dynamic
-de.build_interconnector_to(ch, 2700)   # static
-de.build_interconnector_to(nl, 4250)   # dynamic
-de.build_interconnector_to(at, 5400)   # static
+de.build_interconnector_to(oth, 7815, 100.0) # static
+de.build_interconnector_to(fr, 2300, 100.0)   # static
+de.build_interconnector_to(dk, 2500, 100.0)   # dynamic
+de.build_interconnector_to(ch, 2700, 100.0)   # static
+de.build_interconnector_to(nl, 4250, 100.0)   # dynamic
+de.build_interconnector_to(at, 5400, 100.0)   # static
 
-nl.build_interconnector_to(no, 700)    # static
-nl.build_interconnector_to(uk, 1000)   # static
-nl.build_interconnector_to(be, 1400)   # dynamic
-nl.build_interconnector_to(de, 4250)   # dynamic
+nl.build_interconnector_to(no, 700, 100.0)    # static
+nl.build_interconnector_to(uk, 1000, 100.0)   # static
+nl.build_interconnector_to(be, 1400, 100.0)   # dynamic
+nl.build_interconnector_to(de, 4250, 100.0)   # dynamic
 
-dk.build_interconnector_to(no, 1640)
-dk.build_interconnector_to(se, 2440)
-dk.build_interconnector_to(de, 2765)
+dk.build_interconnector_to(no, 1640, 100.0)
+dk.build_interconnector_to(se, 2440, 100.0)
+dk.build_interconnector_to(de, 2765, 100.0)
 
 # Let's call the ETM to calculate some price-curves and volumes for us
 iterations = 2
@@ -62,6 +62,5 @@ for i in range(1, iterations):
     # And recalculate again!
     area.calculate_all(iteration=i)
 
-print(logger.prices)
 logger.plot()
 logger.export(path / 'output')

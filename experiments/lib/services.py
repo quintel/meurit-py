@@ -52,11 +52,12 @@ class Scenario:
         return self.download_curve('electricity_price.csv')
 
 
-    def set_interconnector_capacity(self, index, capacity):
+    def create_interconnector(self, index, capacity, import_availability):
         data = {'scenario': {
             'user_values': {
                 f'electricity_interconnector_{index}_capacity': capacity,
                 f'electricity_interconnector_{index}_co2_emissions_future': 0,
+                f'electricity_interconnector_{index}_import_availability': import_availability
             }
         }}
         response = requests.put(self.base_url, json=data)
@@ -65,7 +66,7 @@ class Scenario:
 
         raise ScenarioException(info='creating interconnectors')
 
-    def set_interconnector(self, index, price_curve):
+    def update_interconnector(self, index, price_curve):
         file = price_curve['Price (Euros)'].to_csv(index=False, header=False)
         data = {'file': ('mEUrit_curve.csv', file)}
         response = requests.put(
@@ -75,9 +76,9 @@ class Scenario:
 
         if response.ok: return
 
-        raise ScenarioException(info=f'setting interconnectors')
+        raise ScenarioException(info='setting interconnectors')
 
 class ScenarioException(BaseException):
-     def __init__(self, info):
+    def __init__(self, info):
+        super().__init__()
         self.message = f'Something went wrong connecting to the ETM when {info}'
-

@@ -61,8 +61,13 @@ class DataLogger:
         self.plot_volumes()
 
 
+    def export(self, path):
+        self.prices.to_csv(path / 'all_prices.csv')
+        self.volumes.to_csv(path / 'all_volumes.csv')
+
+
     def plot_prices(self):
-        fig, axes = plt.subplots(nrows=1, ncols=self.country_len + 1)
+        fig, axes = plt.subplots(nrows=1, ncols=12)
 
         counter = 0
         for country, df in self.prices.groupby(level='country', axis=1):
@@ -80,7 +85,8 @@ class DataLogger:
 
 
     def plot_volumes(self):
-        fig, axes = plt.subplots(nrows=self.country_len + 1, ncols=self.country_len)
+        plt.rcParams.update({'axes.labelsize': 'small'})
+        fig, axes = plt.subplots(nrows=12, ncols=6)
 
         self.volumes.drop('placeholder', axis=1, level=1, inplace=True)
 
@@ -90,6 +96,9 @@ class DataLogger:
             for to, df_to in df.groupby(level='to', axis=1):
                 axes[coun,sub].title.set_text(f'{country} & {to}')
 
+                self.fill_up(df_to, country, to, key='export')
+                self.fill_up(df_to, country, to, key='import')
+
                 export_err = [
                     (df_to[(country, to, 'export-mean')] - df_to[(country, to, 'export-min')]).values,
                     (df_to[(country, to, 'export-max')] - df_to[(country, to, 'export-mean')]).values
@@ -98,7 +107,6 @@ class DataLogger:
                     (df_to[(country, to, 'import-mean')] - df_to[(country, to, 'import-min')]).values,
                     (df_to[(country, to, 'import-max')] - df_to[(country, to, 'import-mean')]).values
                 ]
-
 
                 df_to[[(country, to, 'export-mean'),(country, to, 'import-mean')]].plot(
                     kind='bar',
@@ -113,6 +121,12 @@ class DataLogger:
 
         plt.show()
 
+
+    def fill_up(self, df, country, to, key='import'):
+        if not f'{key}-mean' in df[(country, to)].columns:
+            df[(country, to, f'{key}-mean')] = 0
+            df[(country, to, f'{key}-min')] = 0
+            df[(country, to, f'{key}-max')] = 0
 
     @staticmethod
     def extract_price(country):

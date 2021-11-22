@@ -59,8 +59,8 @@ class Country:
         # Disable the interconnector in the ETM
         self.scenario.set_interconnector_capacity(len(self.interconnectors), 0)
 
-        if not other.interconnector_to(self):
-            other.build_interconnector_to(self, capacity)
+        # if not other.interconnector_to(self):
+        #     other.build_interconnector_to(self, capacity)
 
     def interconnector_to(self, country):
         '''
@@ -128,8 +128,8 @@ class InactiveCountry(Country):
         '''
         self.interconnectors.add(Interconnector(self, other, capacity))
 
-        if not other.interconnector_to(self):
-            other.build_interconnector_to(self, capacity)
+        # if not other.interconnector_to(self):
+        #     other.build_interconnector_to(self, capacity)
 
 
     def update(self):

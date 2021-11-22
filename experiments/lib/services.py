@@ -54,7 +54,10 @@ class Scenario:
 
     def set_interconnector_capacity(self, index, capacity):
         data = {'scenario': {
-            'user_values': {f'electricity_interconnector_{index}_capacity': capacity}
+            'user_values': {
+                f'electricity_interconnector_{index}_capacity': capacity,
+                f'electricity_interconnector_{index}_co2_emissions_future': 0,
+            }
         }}
         response = requests.put(self.base_url, json=data)
 

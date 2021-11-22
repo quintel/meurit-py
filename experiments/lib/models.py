@@ -46,7 +46,8 @@ class Country:
         self.logger = None
 
 
-    def build_interconnector_to(self, other, capacity, import_availability):
+    def build_interconnector_to(self, other, capacity, import_availability=100.0,
+        export_availability=100.0):
         '''
         Add an interconnector to another country to the collection, sets the
         initial capacity to zero
@@ -55,10 +56,12 @@ class Country:
             other (Country): the country to connect to
             capacity (int): the capacity of the interconnector in MW
             import_availability (float): the percentage of capacity that is available for import
+            export_availability (float): the percentage of capacity that is available for export
         '''
-        self.interconnectors.add(Interconnector(self, other, capacity, import_availability))
+        self.interconnectors.add(Interconnector(self, other, capacity,
+            import_availability, export_availability))
         # Disable the interconnector in the ETM
-        self.scenario.create_interconnector(len(self.interconnectors), 0, 0)
+        self.scenario.create_interconnector(len(self.interconnectors), 0, 0, 0)
 
         # if not other.interconnector_to(self):
         #     other.build_interconnector_to(self, capacity, import_availability)
@@ -87,7 +90,7 @@ class Country:
         '''TODO: set all of them in one call'''
         for index, interconnector in enumerate(self.interconnectors):
             self.scenario.create_interconnector(index+1, interconnector.capacity,
-                interconnector.import_availability)
+                interconnector.import_availability, interconnector.export_availability)
 
 
     def calculate(self):
@@ -120,7 +123,8 @@ class InactiveCountry(Country):
         self.price_curve[self.price_curve < 0] = 0
 
 
-    def build_interconnector_to(self, other, capacity, import_availability):
+    def build_interconnector_to(self, other, capacity, import_availability=100.0,
+        export_availability=100.0):
         '''
         Add an interconnector to another country to the collection.
 
@@ -129,7 +133,8 @@ class InactiveCountry(Country):
             capacity (int): the capacity of the interconnector in MW
             import_availability (float): the percentage of capacity that is available for import
         '''
-        self.interconnectors.add(Interconnector(self, other, capacity, import_availability))
+        self.interconnectors.add(Interconnector(self, other, capacity, import_availability,
+            export_availability))
 
         # if not other.interconnector_to(self):
         #     other.build_interconnector_to(self, capacity, import_availability)
@@ -175,13 +180,13 @@ class InterconnectorCollection:
 
 
 class Interconnector:
-    # Everything is a reference, these in here are the actual countries ;) No copies. I love it.
-    # It's association heaven :)) or hell??
-    def __init__(self, from_country, to_country, capacity, import_availability):
+    def __init__(self, from_country, to_country, capacity, import_availability,
+        export_availability):
         self.from_country = from_country
         self.to_country = to_country
         self.capacity = capacity
         self.import_availability = import_availability
+        self.export_availability = export_availability
 
 
 # class NoInterconnectorDefined(BaseException):

@@ -52,12 +52,13 @@ class Scenario:
         return self.download_curve('electricity_price.csv')
 
 
-    def create_interconnector(self, index, capacity, import_availability):
+    def create_interconnector(self, index, capacity, import_availability, export_availability):
         data = {'scenario': {
             'user_values': {
                 f'electricity_interconnector_{index}_capacity': capacity,
                 f'electricity_interconnector_{index}_co2_emissions_future': 0,
-                f'electricity_interconnector_{index}_import_availability': import_availability
+                f'electricity_interconnector_{index}_import_availability': import_availability,
+                f'electricity_interconnector_{index}_export_availability': export_availability
             }
         }}
         response = requests.put(self.base_url, json=data)

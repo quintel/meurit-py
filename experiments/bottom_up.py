@@ -31,7 +31,7 @@ be.build_interconnector_to(nl, 2400, 0.58, 100.0)    # dynamic
 
 de.build_interconnector_to(oth, 7815, 100.0, 100.0)  # static
 de.build_interconnector_to(fr, 2300, 0.78, 100.0)    # static
-de.build_interconnector_to(dk, 2765, 0.78, 100.0)    # dynamic
+de.build_interconnector_to(dk, 2765, 0.90, 100.0)    # dynamic
 de.build_interconnector_to(ch, 4600, 0.59, 100.0)    # static
 de.build_interconnector_to(nl, 4250, 100.0, 100.0)   # dynamic
 de.build_interconnector_to(at, 5400, 100.0, 100.0)   # static

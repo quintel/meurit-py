@@ -46,7 +46,7 @@ dk.build_interconnector_to(se, 2440, import_availability=81.0)    # static
 dk.build_interconnector_to(de, 2765, export_availability=90.0)    # dynamic
 
 # Let's call the ETM to calculate some price-curves and volumes for us
-iterations = 2
+iterations = 20
 
 logger = DataLogger(iterations, [nl, be, de, dk])
 area.attach_logger(logger)
@@ -63,4 +63,4 @@ for i in range(1, iterations):
     area.calculate_all(iteration=i)
 
 logger.plot()
-logger.export(path / 'output')
+logger.export(path / 'output_20_it')

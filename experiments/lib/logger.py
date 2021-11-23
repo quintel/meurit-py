@@ -9,6 +9,7 @@ class DataLogger:
         self.create_prices(iterations, countries)
         self.create_volumes(iterations, countries)
         self.country_len = len(countries)
+        self.countries = countries
         # energy_interconnector_1_exported_electricity.input (MW)
 
 
@@ -67,10 +68,12 @@ class DataLogger:
 
 
     def plot_prices(self):
-        fig, axes = plt.subplots(nrows=1, ncols=12)
+        fig, axes = plt.subplots(nrows=1, ncols=self.country_len)
 
         counter = 0
         for country, df in self.prices.groupby(level='country', axis=1):
+            if not self.active_country(country): continue
+
             axes[counter].title.set_text(f'Mean price in {country} (euro)')
             err = [
                 (df[(country, 'mean')] - df[(country, 'min')]).values,
@@ -84,16 +87,28 @@ class DataLogger:
         plt.show()
 
 
+    def active_country(self, country_name):
+        for country in self.countries:
+            if country.name == country_name:
+                return True
+
+        return False
+
+
     def plot_volumes(self):
         plt.rcParams.update({'axes.labelsize': 'small'})
-        fig, axes = plt.subplots(nrows=12, ncols=6)
+        fig, axes = plt.subplots(nrows=self.country_len, ncols=2)
 
         self.volumes.drop('placeholder', axis=1, level=1, inplace=True)
 
         coun = 0
         for country, df in self.volumes.groupby(level='country', axis=1):
+            if not self.active_country(country): continue
+
             sub = 0
             for to, df_to in df.groupby(level='to', axis=1):
+                if not self.active_country(to): continue
+
                 axes[coun,sub].title.set_text(f'{country} & {to}')
 
                 self.fill_up(df_to, country, to, key='export')

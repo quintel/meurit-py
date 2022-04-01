@@ -4,6 +4,6 @@ from setuptools import find_packages, setup
 
 setup(
     name='meurit',
-    package_dir={'': 'src'},
-    packages=find_packages(where='src'),
+    package_dir={'': 'src', 'vendor.rython': 'vendor'},
+    packages=find_packages(where='src') + ['vendor.rython'],
 )

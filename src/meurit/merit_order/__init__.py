@@ -1,7 +1,12 @@
+import os
+
 import vendor.rython as rython
 from meurit.merit_order.builder import MeritOrderBuilder
 
-merit_context = rython.RubyContext(requires=['bundler/setup', "quintel_merit"], debug=True)
+merit_context = rython.RubyContext(
+    requires=['bundler/setup', "quintel_merit"],
+    debug=os.getenv('DEBUG_RYTHON') == 'true'
+)
 
 class MeritOrder:
     '''Sorta wraps the Ruby Merit gem'''

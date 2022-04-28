@@ -84,7 +84,11 @@ def convert_to_ruby_key_value_pair(key, value):
         return f'{key}: {load_profile(value)}'
 
     if isinstance(value, str) and value[0] != ':':
-        return f"{key}: '{value}'"
+        value = f"'{value}'"
+    elif value is True:
+        value = 'true'
+    elif value is False:
+        value = 'false'
 
     return f'{key}: {value}'
 

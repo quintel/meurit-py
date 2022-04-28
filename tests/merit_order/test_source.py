@@ -62,6 +62,28 @@ def test_users():
     assert user['total_consumption'] == 417946498897.5582
 
 
+def test_interconnectors():
+    source = Source(Path('tests/fixtures/dummy_config'))
+
+    interconnectors = source.interconnectors()
+
+    interconnector = next(interconnectors)
+
+    assert interconnector['key'] == ':interconnector_nl_be'
+    assert interconnector['p_mw'] == 700
+
+
+def test_flex():
+    source = Source(Path('tests/fixtures/flex_config'))
+
+    users = source.flex()
+
+    user = next(users)
+
+    assert user['key'] == ':flex_1'
+    assert user['type'] == 'Merit::Flex::Base'
+
+
 def test_source_with_invalid_path():
     invalid_path = Path('tests/fixtures/non_existing_folder')
 

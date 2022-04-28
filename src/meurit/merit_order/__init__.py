@@ -20,7 +20,7 @@ class MeritOrder:
 
         See MO docs for all types of participants.
         '''
-        self._add(merit_context(f"Merit::{participant}.new({convert_to_ruby_hash_string(kwargs)})"))
+        self._add(merit_context(f"{participant}.new({convert_to_ruby_hash_string(kwargs)})"))
 
 
     def add_user(self, **kwargs):

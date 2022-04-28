@@ -20,7 +20,7 @@ def test_merit_instance():
 def test_add_participant(must_run_values):
     mo = MeritOrder()
 
-    mo.add_participant(participant='MustRunProducer', **must_run_values)
+    mo.add_participant(participant='Merit::MustRunProducer', **must_run_values)
 
     assert mo.merit_order("to_s")  == '#<Merit::Order (1 producers, 0 users, 0 flex, 0 price-sensitives)>'
     assert mo.merit_order("participants")("first")("to_s") == f'#<Merit::MustRunProducer {must_run_values["key"][1:]}>'
@@ -50,7 +50,7 @@ def test_calculate_and_price_curve(must_run_values):
     mo.add_user(**user_values)
 
     # Add supply
-    mo.add_participant(participant='DispatchableProducer',
+    mo.add_participant(participant='Merit::DispatchableProducer',
         key=':my_dispatchable',
         availability=0.97,
         marginal_costs=81.34086561,

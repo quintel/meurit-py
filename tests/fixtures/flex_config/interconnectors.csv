@@ -1,0 +1,6 @@
+key,from_region,to_region,p_mw,scaling,in_service
+interconnector_nl_be,nl,be,700,1.0,True
+interconnector_nl_de,nl,de,500,1.0,True
+interconnector_nl_dk,nl,dk,1400,1.0,True
+interconnector_nl_no,nl,no,250,1.0,True
+interconnector_nl_uk,nl,uk,240,1.0,True

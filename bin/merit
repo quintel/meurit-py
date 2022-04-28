@@ -1,0 +1,42 @@
+import argparse
+import pathlib
+import sys
+import os
+
+# This is probably not the correct way to allow "import vendor.rython" to work...
+sys.path.append(".")
+
+from meurit.merit_order.builder import MeritOrderBuilder
+from meurit.merit_order.source import Source
+from meurit.merit_order import MeritOrder
+
+parser = argparse.ArgumentParser(description="Run Merit using CSVs.")
+parser.add_argument(
+    "--from",
+    dest="from_path",
+    help="path containing CSVs to set up Merit",
+    required=True,
+    type=pathlib.Path,
+)
+parser.add_argument(
+    "--to",
+    dest="to_path",
+    help="path in which to store the output of Merit",
+    required=True,
+    type=pathlib.Path,
+)
+
+args = parser.parse_args()
+print(args.from_path, args.to_path)
+
+order = MeritOrder()
+source = Source(args.from_path)
+
+MeritOrderBuilder(order, source).build_from_source()
+
+order.calculate()
+
+os.makedirs(args.to_path, exist_ok=True)
+
+with open(args.to_path / 'price_curve.csv', 'w') as f:
+    f.write("\n".join(map(str, order.price_curve())))

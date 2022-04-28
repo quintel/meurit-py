@@ -16,4 +16,5 @@ meurit = {editable = true, path = "."}
 python_version = "3.8"
 
 [scripts]
+merit = "python bin/merit"
 tests = "python -m pytest"

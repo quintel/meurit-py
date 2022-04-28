@@ -7,4 +7,4 @@ git_source(:github) do |repo_name|
   "https://github.com/#{ repo_name }.git"
 end
 
-gem 'quintel_merit', ref: '1ebfc82', github: 'quintel/merit'
+gem 'quintel_merit', ref: 'dbbfc43', github: 'quintel/merit'

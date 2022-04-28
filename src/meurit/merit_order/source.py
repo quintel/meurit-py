@@ -42,7 +42,15 @@ class Source:
         yield from self._clean_rows_from('users')
 
 
-    # TODO: interconnectors
+    def interconnectors(self):
+        '''
+        Reads users from the correct file
+
+        Returns:
+            Generator[dict]: user settings
+        '''
+        yield from self._clean_rows_from('interconnectors')
+
 
     # Private ------------------------------------------------------------------
 

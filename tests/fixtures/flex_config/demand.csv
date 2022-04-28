@@ -1,0 +1,2 @@
+key,path_to_load_profile,total_consumption,load_curve,consumption_share
+total_demand,load_profiles/fake_curve.csv,417946498897.5582,,

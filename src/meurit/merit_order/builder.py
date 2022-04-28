@@ -11,6 +11,7 @@ class MeritOrderBuilder:
     def build_from_source(self):
         self._build_users()
         self._build_producers()
+        self._build_flex()
         self._build_interconnectors()
 
     def _build_users(self):
@@ -19,7 +20,12 @@ class MeritOrderBuilder:
 
     def _build_producers(self):
         for producer in self.source.producers():
-            self.merit_order.add_participant(producer["type"], **producer)
+            self.merit_order.add_participant("Merit::" + producer["type"], **producer)
+
+    def _build_flex(self):
+        for flex in self.source.flex():
+            print(flex)
+            self.merit_order.add_participant(flex["type"], **flex)
 
     def _build_interconnectors(self):
         for connector in self.source.interconnectors():
@@ -43,7 +49,7 @@ class MeritOrderBuilder:
             }
 
             self.merit_order.add_participant(
-                "VariableDispatchableProducer", **common_attrs, **import_attrs
+                "Merit::VariableDispatchableProducer", **common_attrs, **import_attrs
             )
 
             # Export
@@ -56,5 +62,5 @@ class MeritOrderBuilder:
             }
 
             self.merit_order.add_participant(
-                "Flex::VariableConsumer", **common_attrs, **export_attrs
+                "Merit::Flex::VariableConsumer", **common_attrs, **export_attrs
             )

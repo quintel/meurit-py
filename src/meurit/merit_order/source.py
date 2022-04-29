@@ -23,6 +23,8 @@ FLEX_TYPES = {
     "storage": "Merit::Flex::Storage",
 }
 
+CURVE_KEYS = ['availability_curve', 'load_profile']
+
 
 class Source:
     """Class that helps with IO, generating merit order settings from supplied csvs"""
@@ -133,8 +135,8 @@ class Source:
 
             row["type"] = FLEX_TYPES[row["type"]]
 
-        if "load_profile" in row and isinstance(row["load_profile"], str):
-            self._set_load_profile(row)
+        # if "load_profile" in row and isinstance(row["load_profile"], str):
+        self._set_curves(row)
 
         return row.dropna().to_dict()
 
@@ -152,17 +154,18 @@ class Source:
                 f'Type should be one of {VALID_PRODUCERS} ({LOCATIONS["producers"]}: {row["key"]})'
             )
 
-    def _set_load_profile(self, row):
+    def _set_curves(self, row):
         """
-        Extends the load profile path, including path validation
+        Extends curve paths, including path validation
 
         Params:
             row(pd.Series): The row we're iterating over
         """
-        lpf_path = self.path / row["load_profile"]
-        if not lpf_path.exists():
-            raise InvalidSourceError(f"Load profile could not be located ({lpf_path})")
-        row["load_profile"] = lpf_path
+        for key in (k for k in CURVE_KEYS if k in row and isinstance(row[k], str)):
+            lpf_path = self.path / row[key]
+            if not lpf_path.exists():
+                raise InvalidSourceError(f"{key} could not be located ({lpf_path})")
+            row[key] = lpf_path
 
 
 class MissingSourceError(BaseException):

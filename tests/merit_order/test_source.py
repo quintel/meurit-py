@@ -72,6 +72,10 @@ def test_interconnectors():
     assert interconnector['key'] == ':interconnector_nl_be'
     assert interconnector['p_mw'] == 700
 
+    assert interconnector['availability_curve'] == Path(
+        'tests/fixtures/dummy_config/availability_curves/fake.csv'
+    )
+
 
 def test_flex():
     source = Source(Path('tests/fixtures/flex_config'))
@@ -97,7 +101,7 @@ def test_with_invalid_csvs():
     # Demand has an invalid load_profile
     users = source.users()
 
-    with pytest.raises(InvalidSourceError, match=r'Load profile'):
+    with pytest.raises(InvalidSourceError, match=r'load_profile'):
         next(users)
 
     # Supply is a csv with some extra commas at the end. It should not be parsable.

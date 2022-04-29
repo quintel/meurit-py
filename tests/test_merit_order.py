@@ -2,6 +2,7 @@
 # pylint: disable=import-error disable=redefined-outer-name disable=missing-function-docstring disable=invalid-name
 
 import pytest
+from pathlib import Path
 
 from meurit.merit_order import MeritOrder
 
@@ -38,6 +39,14 @@ def test_add_user():
 
     assert mo.merit_order("to_s")  == '#<Merit::Order (0 producers, 1 users, 0 flex, 0 price-sensitives)>'
     assert mo.merit_order("participants")("first")("to_s") == f'#<Merit::User::TotalConsumption {user_values["key"][1:]}>'
+
+
+def test_add_interconnector_with_curve():
+    attrs = {
+        'key': 'interconnector',
+        'marignal_costs': 0.0,
+        'availability_curve': Path('tests/fixtures/dummy_config/availability_curves/fake.csv'),
+    }
 
 
 def test_calculate_and_price_curve(must_run_values):

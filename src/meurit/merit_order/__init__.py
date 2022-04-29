@@ -20,6 +20,7 @@ class MeritOrder:
 
         See MO docs for all types of participants.
         '''
+        print(convert_to_ruby_hash_string(kwargs))
         self._add(merit_context(f"{participant}.new({convert_to_ruby_hash_string(kwargs)})"))
 
 
@@ -83,6 +84,9 @@ def convert_to_ruby_key_value_pair(key, value):
     if key == 'load_profile':
         return f'{key}: {load_profile(value)}'
 
+    if key == 'availability_curve':
+        return f'availability: {curve(value)}'
+
     if isinstance(value, str) and value[0] != ':':
         value = f"'{value}'"
     elif value is True:
@@ -96,3 +100,8 @@ def convert_to_ruby_key_value_pair(key, value):
 def load_profile(path):
     '''Returns a str version of Ruby code for creating a load profile from a path'''
     return f"Merit::LoadProfile.load('{path}')"
+
+
+def curve(path):
+    '''Returns a str version of Ruby code for creating a curve from a path'''
+    return f"Merit::Curve.load_file('{path}')"

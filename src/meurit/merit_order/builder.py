@@ -24,7 +24,6 @@ class MeritOrderBuilder:
 
     def _build_flex(self):
         for flex in self.source.flex():
-            print(flex)
             self.merit_order.add_participant(flex["type"], **flex)
 
     def _build_interconnectors(self):
@@ -34,10 +33,9 @@ class MeritOrderBuilder:
 
             # TODO: It's not clear what to do with the "to_region" or "scaling" attributes.
             common_attrs = {
+                "availability_curve": connector["availability_curve"],
                 "marginal_costs": connector["marginal_costs"],
                 "number_of_units": 1.0,
-                # TODO: This should be specified via the CSV.
-                "availability": [1.0] * 8760,
             }
 
             # Import

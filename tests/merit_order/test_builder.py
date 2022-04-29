@@ -39,6 +39,7 @@ def test_build_interconnectors_from_source():
     connector = mo.merit_order("participants")("flex")("first")
     assert connector("key") == 'interconnector_nl_be_export'
     assert connector("unused_input_capacity_at(0)") == 700
+    assert connector("cost_strategy")("sortable_cost") == 10.0
 
 def test_build_flex_from_source():
     mo = MeritOrder()

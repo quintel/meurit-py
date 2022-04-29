@@ -34,11 +34,10 @@ class MeritOrderBuilder:
 
             # TODO: It's not clear what to do with the "to_region" or "scaling" attributes.
             common_attrs = {
+                "marginal_costs": connector["marginal_costs"],
                 "number_of_units": 1.0,
                 # TODO: This should be specified via the CSV.
                 "availability": [1.0] * 8760,
-                # TODO: The interconnector needs a price specified in the CSV.
-                "marginal_costs": 1.0,
             }
 
             # Import

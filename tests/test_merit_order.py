@@ -5,6 +5,7 @@ import pytest
 from pathlib import Path
 
 from meurit.merit_order import MeritOrder
+from meurit.merit_order.source import Source
 
 @pytest.fixture
 def must_run_values():
@@ -71,3 +72,59 @@ def test_calculate_and_price_curve(must_run_values):
     pc = mo.price_curve()
     assert isinstance(pc, list)
     assert len(pc) == 8760
+
+def test_dispatchables():
+    mo = MeritOrder.from_source(Source(Path('tests/fixtures/flex_config')))
+
+    mo.calculate()
+
+    dispatchables = mo.dispatchables_at(300)
+
+    assert len(dispatchables) > 1
+    assert len(dispatchables[0]) == 3
+    assert dispatchables[0][0] == 'flex_1'
+    # Available capacity
+    assert dispatchables[0][1] == 2.0
+
+    # dp = mo.dispatchables()("map { |d| d.load_curve.to_a }")
+
+    assert len(dispatchables) > 1
+    assert len(dispatchables[2]) == 3
+    assert dispatchables[2][0] == 'interconnector_nl_be_import'
+    # Available capacity
+    assert dispatchables[2][1] == 0
+
+def test_dispatchables_at_with_out_of_bounds_time():
+    mo = MeritOrder.from_source(Source(Path('tests/fixtures/flex_config')))
+
+    mo.calculate()
+    dispatchables = mo.dispatchables_at(8770)
+
+    # At non existing time point we act like the full capacity is available
+    assert len(dispatchables) > 1
+    assert len(dispatchables[0]) == 3
+    assert dispatchables[0][0] == 'flex_1'
+    assert dispatchables[0][1] == 2.0
+
+def test_first_available_dispatchable():
+    mo = MeritOrder.from_source(Source(Path('tests/fixtures/flex_config')))
+
+    mo.calculate()
+
+    disp_key, disp_av_cap, marg_costs = mo.first_available_dispatchable_at(300)
+
+    assert disp_key == 'flex_1'
+    assert disp_av_cap == 2.0
+    assert marg_costs == 0.5
+
+# TODO: finish this test with the method
+# def test_inject_curve_into_interconnector():
+#     mo = MeritOrder.from_source(Source(Path('tests/fixtures/flex_config')))
+
+#     mo.calculate()
+
+#     print(mo.dispatchables()("map(&:key)"))
+#     curvy = mo.inject_curve('interconnector_nl_be_import', [0.5]*8760)
+
+
+#     assert curvy == 1

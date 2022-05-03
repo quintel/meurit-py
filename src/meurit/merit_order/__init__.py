@@ -1,6 +1,6 @@
 import os
 
-import vendor.rython as rython
+from vendor import rython
 from meurit.merit_order.builder import MeritOrderBuilder
 
 merit_context = rython.RubyContext(
@@ -13,16 +13,13 @@ class MeritOrder:
     def __init__(self):
         self.merit_order = merit_context("Merit::Order.new")
 
-
     def add_participant(self, participant='MustRunProducer', **kwargs):
         '''
         Adds a participant to the Merit Order (supply).
 
         See MO docs for all types of participants.
         '''
-        print(convert_to_ruby_hash_string(kwargs))
         self._add(merit_context(f"{participant}.new({convert_to_ruby_hash_string(kwargs)})"))
-
 
     def add_user(self, **kwargs):
         '''
@@ -36,21 +33,66 @@ class MeritOrder:
         '''
         self._add(merit_context(f"Merit::User.create({convert_to_ruby_hash_string(kwargs)})"))
 
-
     def _add(self, participant):
         '''Add a Merit::Participant to the merit order'''
         self.merit_order('add(%(new_participant)r)', new_participant=participant)
-
 
     def calculate(self):
         '''Calculates the Merit Order based on the added participants'''
         self.merit_order('calculate')
 
-
     def price_curve(self):
         '''Returns the price curve'''
         return self.merit_order('price_curve')('to_a')
 
+    def dispatchables_at(self, hour):
+        '''
+        Returns the order of dispatchables in the given hour. Can only be called after calculate.
+
+        Returns:
+            list[list[str, float, float]]: a list with all dispatchables ordered by
+                                           marginal costs (key, available capacity, marginal_costs)
+        '''
+
+        ruby_map = """
+        map do |disp|
+            if disp.is_a?(Merit::VariableDispatchableProducer)
+                total_capacity = disp.respond_to?(:input_capacity_per_unit) ? disp.input_capacity_per_unit : disp.output_capacity_per_unit
+            else
+                total_capacity = disp.available_output_capacity
+            end
+
+            [disp.key, total_capacity - disp.load_at(%(hour)r), disp.marginal_costs]
+        end
+        """
+
+        return self.dispatchables()(ruby_map, hour=hour)
+
+    def dispatchables(self):
+        '''Returns RubyProxy of dispatchables. Only makes sense after calculate is called'''
+        return self.merit_order('participants')('dispatchables')
+
+    def first_available_dispatchable_at(self, hour):
+        '''
+        Returns the key, available capacity and marginal costs of the price setting dispatchable
+        in a tuple.
+        If none is available, returns an empty tuple.
+
+        Only call this after calling calculate at least once
+        '''
+        for key, available_capacity, marginal_cost in self.dispatchables_at(hour):
+            if available_capacity:
+                return (key, available_capacity, marginal_cost)
+
+        return ()
+
+    # TODO: add method to reinject curves into interconnectors.
+    def inject_curve(self, interconnector_key, curve):
+        '''Inject availability curves back into the interconnector'''
+        # Q: remove the old one and replace it? Or replace the curve? Or create a new
+        # copy the full MeritOrder with the new curves?
+        participant = self.dispatchables()("find {|d| d.key == %(key)r}", key=interconnector_key)
+        return participant('availability')
 
     @classmethod
     def from_source(cls, source):

@@ -9,6 +9,10 @@ class MeritOrderBuilder:
         self.source = source
 
     def build_from_source(self):
+        '''
+        Builds the Merit order.
+        The instance is filled with participants from the csvs in the Source
+        '''
         self._build_users()
         self._build_producers()
         self._build_flex()
@@ -38,6 +42,10 @@ class MeritOrderBuilder:
                 "number_of_units": 1.0,
             }
 
+            # TODO: avaibility curves start at all zeroes
+
+            # TODO: import and export usually don't have the same capacity - we need the
+            # interconnectors from the other sources to inject as import is my guess
             # Import
 
             import_attrs = {

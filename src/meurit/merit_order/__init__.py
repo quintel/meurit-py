@@ -2,16 +2,18 @@ import os
 
 from vendor import rython
 from meurit.merit_order.builder import MeritOrderBuilder
+from meurit.merit_order.participants import Participants
 
 merit_context = rython.RubyContext(
     requires=['bundler/setup', "quintel_merit"],
     debug=os.getenv('DEBUG_RYTHON') == 'true'
 )
 
-class MeritOrder:
+class MeritOrder(Participants):
     '''Sorta wraps the Ruby Merit gem'''
     def __init__(self):
         self.merit_order = merit_context("Merit::Order.new")
+        self._lock = False
 
     def add_participant(self, participant='MustRunProducer', **kwargs):
         '''
@@ -19,7 +21,9 @@ class MeritOrder:
 
         See MO docs for all types of participants.
         '''
-        self._add(merit_context(f"{participant}.new({convert_to_ruby_hash_string(kwargs)})"))
+        new_instance = f"{participant}.new({convert_to_ruby_hash_string(kwargs)})"
+        self._add(merit_context(new_instance))
+        self.cache_participant(new_instance)
 
     def add_user(self, **kwargs):
         '''
@@ -31,20 +35,50 @@ class MeritOrder:
                     Required: key. Choose one of: total_consumption,
                     load_curve, consumption_share.
         '''
-        self._add(merit_context(f"Merit::User.create({convert_to_ruby_hash_string(kwargs)})"))
+        new_instance = f"Merit::User.create({convert_to_ruby_hash_string(kwargs)})"
+        self._add(merit_context(new_instance))
+        self.cache_participant(new_instance)
 
     def _add(self, participant):
         '''Add a Merit::Participant to the merit order'''
         self.merit_order('add(%(new_participant)r)', new_participant=participant)
 
-    def calculate(self):
+    def calculate(self, auto_build=True):
         '''Calculates the Merit Order based on the added participants'''
-        self.merit_order('calculate')
+        if not self.is_locked():
+            self.merit_order('calculate')
+            self.lock()
+        elif auto_build:
+            self.rebuild()
+            self.calculate()
+        else:
+            raise MeritLockedException('The Merit order needs to be rebuilt before calulating')
+
+    def unlock(self):
+        '''Unlocks MO'''
+        self._lock = False
+
+    def lock(self):
+        '''Locks the MO'''
+        self._lock = True
+
+    def is_locked(self):
+        '''Check if MO is currently locked'''
+        return self._lock
+
+    def rebuild(self):
+        '''Recreates the MO and all it's participants'''
+        self.merit_order = merit_context("Merit::Order.new")
+        for participant in self.cached_participants():
+            self._add(merit_context(participant))
+
+        self.unlock()
 
     def price_curve(self):
         '''Returns the price curve'''
         return self.merit_order('price_curve')('to_a')
 
+    # TODO: Move all dispatchables methods to seperate file
     def dispatchables_at(self, hour):
         '''
         Returns the order of dispatchables in the given hour. Can only be called after calculate.
@@ -83,16 +117,24 @@ class MeritOrder:
         for key, available_capacity, marginal_cost in self.dispatchables_at(hour):
             if available_capacity:
                 return (key, available_capacity, marginal_cost)
-
+        # else:
+        #     return (key, available_capacity, marginal_cost)
+        # TODO return last one if none was found
         return ()
 
-    # TODO: add method to reinject curves into interconnectors.
-    def inject_curve(self, interconnector_key, curve):
-        '''Inject availability curves back into the interconnector'''
-        # Q: remove the old one and replace it? Or replace the curve? Or create a new
-        # copy the full MeritOrder with the new curves?
-        participant = self.dispatchables()("find {|d| d.key == %(key)r}", key=interconnector_key)
-        return participant('availability')
+    def inject_curve(self, interconnector_key, availability_curve):
+        '''
+        Inject availability curves back into the interconnector for recalulation
+
+        Params:
+            interconnector_key(str): ...
+            availability_curve(list[float]): ...
+        '''
+        # TODO: create a new participant with the same key and replace the curves in it
+        # and replace it in the cache for rebuilding
+        # Check if we have to write it to somewhere or if we can create the curve in another
+        # way directly
+
 
     @classmethod
     def from_source(cls, source):
@@ -107,6 +149,8 @@ class MeritOrder:
 
         return mo
 
+class MeritLockedException(BaseException):
+    '''Merit order has been locked and needs to be rebuilt before calculating'''
 
 # Helper functions -------------------------------------------------------------
 

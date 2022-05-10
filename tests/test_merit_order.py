@@ -1,10 +1,11 @@
 '''Tests for MeritOrder'''
 # pylint: disable=import-error disable=redefined-outer-name disable=missing-function-docstring disable=invalid-name
 
+import re
 import pytest
 from pathlib import Path
 
-from meurit.merit_order import MeritOrder
+from meurit.merit_order import MeritLockedException, MeritOrder, convert_to_ruby_hash_string, participants
 from meurit.merit_order.source import Source
 
 @pytest.fixture
@@ -123,8 +124,33 @@ def test_first_available_dispatchable():
 
 #     mo.calculate()
 
-#     print(mo.dispatchables()("map(&:key)"))
+#     # print(mo.dispatchables()("map(&:key)")
 #     curvy = mo.inject_curve('interconnector_nl_be_import', [0.5]*8760)
-
-
 #     assert curvy == 1
+
+
+def test_rebuild():
+    # Build and calculate once
+    mo = MeritOrder.from_source(Source(Path('tests/fixtures/flex_config')))
+    mo.calculate()
+
+    # Test quickly that the cheapest interconnector is nl_be
+    dispatchables = mo.dispatchables_at(300)
+    assert dispatchables[2][0] == 'interconnector_nl_be_import'
+
+    # Change the cheapest interconnectors marginal costs
+    participant = mo.get_participant_from_cache('interconnector_nl_be_import')
+    participant = re.sub(r'marginal_costs: (\.|[\da-zA-Z])+,', 'marginal_costs: 50.0,', participant)
+
+    # Make sure the lock works!
+    with pytest.raises(MeritLockedException):
+        mo.calculate(auto_build=False)
+
+    # Rebuild and recalulate
+    mo.replace_participant_in_cache(participant)
+    mo.calculate()
+
+    # Now the cheapest interconnector should be another one in Merit
+    dispatchables = mo.dispatchables_at(300)
+    assert dispatchables[2][0] != 'interconnector_nl_be_import'
+    assert dispatchables[2][0] == 'interconnector_nl_de_import'

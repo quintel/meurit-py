@@ -42,7 +42,7 @@ class MeritOrderBuilder:
                 "number_of_units": 1.0,
             }
 
-            # TODO: avaibility curves start at all zeroes
+            # TODO: avaibility curves start at all zeroes, the column can go
 
             # TODO: import and export usually don't have the same capacity - we need the
             # interconnectors from the other sources to inject as import is my guess

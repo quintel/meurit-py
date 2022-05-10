@@ -13,6 +13,19 @@ class Country:
         '''Use the builder to build up the Merit order'''
         MeritOrderBuilder(self.merit_order, self.source).build_from_source()
 
+    def first_available_dispatchable_prices(self):
+        #  vraagt iets aan self.merit_order
+        pass
+
+    def first_available_dispatchable_capacities(self):
+        #  vraagt iets aan self.merit_order
+        pass
+
+    def first_available_dispatchable_keys(self):
+        pass
+
+    def update_availability_curves(self):
+        '''update something on self.merit_order'''
 
 class Area:
     '''Keeps track of the area to be analysed, containing all countries'''

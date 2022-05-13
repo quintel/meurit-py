@@ -91,7 +91,7 @@ class MeritOrder(Participants):
         ruby_map = """
         map do |disp|
             if disp.is_a?(Merit::VariableDispatchableProducer)
-                total_capacity = disp.respond_to?(:input_capacity_per_unit) ? disp.input_capacity_per_unit : disp.output_capacity_per_unit
+                total_capacity = disp.max_load_at(%(hour)r)
             else
                 total_capacity = disp.available_output_capacity
             end
@@ -122,7 +122,7 @@ class MeritOrder(Participants):
         # TODO return last one if none was found
         return ()
 
-    def inject_curve(self, interconnector_key, availability_curve):
+    def inject_curve(self, interconnector_key, curve_values, curve_type='availability'):
         '''
         Inject availability curves back into the interconnector for recalulation
 
@@ -130,11 +130,13 @@ class MeritOrder(Participants):
             interconnector_key(str): ...
             availability_curve(list[float]): ...
         '''
-        # TODO: create a new participant with the same key and replace the curves in it
-        # and replace it in the cache for rebuilding
-        # Check if we have to write it to somewhere or if we can create the curve in another
-        # way directly
+        participant = self.replace_value(
+            self.get_participant_from_cache(interconnector_key),
+            curve_type,
+            curve_values
+        )
 
+        self.replace_participant_in_cache(participant)
 
     @classmethod
     def from_source(cls, source):

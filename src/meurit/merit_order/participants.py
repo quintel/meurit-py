@@ -44,6 +44,29 @@ class Participants():
                 return participant
         return None
 
+    def replace_value(self, participant, key, new_value):
+        '''
+        Replace the value that is currently under the key in the participant with a new value
+
+        Params:
+            participant(str):       Stringified version of a Merit::Participant
+            key(str):               The key to replace the value of
+            new_value(str|float):   The value to replace the old with
+        '''
+        merit_type, attributes = participant.split('(', 1)
+        attributes = attributes.split(', ')
+        # Remove the last bracket
+        attributes[-1] = attributes[-1][:-1]
+
+        for index, attribute in enumerate(attributes):
+            if attribute.startswith(key):
+                attributes[index] = f'{key}: {new_value}'
+                break
+        else:
+            raise KeyError('Key was not found in the participant')
+
+        return f'{merit_type}({", ".join(attributes)})'
+
     # Private
 
     def _key_for(self, participant):

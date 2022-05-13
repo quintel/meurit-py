@@ -118,16 +118,24 @@ def test_first_available_dispatchable():
     assert disp_av_cap == 2.0
     assert marg_costs == 0.5
 
-# TODO: finish this test with the method
-# def test_inject_curve_into_interconnector():
-#     mo = MeritOrder.from_source(Source(Path('tests/fixtures/flex_config')))
+def test_inject_curve_into_interconnector():
+    mo = MeritOrder.from_source(Source(Path('tests/fixtures/flex_config')))
 
-#     mo.calculate()
+    mo.calculate()
 
-#     # print(mo.dispatchables()("map(&:key)")
-#     curvy = mo.inject_curve('interconnector_nl_be_import', [0.5]*8760)
-#     assert curvy == 1
+    # Test current situation
+    dispatchables = mo.dispatchables_at(300)
+    assert dispatchables[2][0] == 'interconnector_nl_be_import'
+    assert dispatchables[2][1] == 0
 
+    # Inject availability
+    mo.inject_curve('interconnector_nl_be_import', [0.0]*8760)
+    mo.calculate()
+
+    # Test changes
+    dispatchables = mo.dispatchables_at(300)
+    assert dispatchables[2][0] == 'interconnector_nl_be_import'
+    assert dispatchables[2][1] == 0
 
 def test_rebuild():
     # Build and calculate once

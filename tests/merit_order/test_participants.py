@@ -73,3 +73,37 @@ def test_participant_key():
     key = participants._key_for(some_participant)
 
     assert key == 'total_demand'
+
+def test_replace_value():
+    participants = Participants()
+
+    user_values = {'key': ':total_demand',
+        'load_profile': 'tests/fixtures/dummy_config/load_profiles/fake_curve.csv',
+        'total_consumption': 1000000,
+        'some_other_attribute': 'one'}
+
+    # Create a participant
+    a_participant = f"Merit::User.create({convert_to_ruby_hash_string(user_values)})"
+
+    print(a_participant)
+
+    # Lets see if we can replace some stuff
+    a_participant = participants.replace_value(a_participant, 'total_consumption', 500)
+    assert '500' in a_participant
+    assert '1000000' not in a_participant
+    print(a_participant)
+    assert a_participant == "Merit::User.create(key: :total_demand, load_profile: Merit::LoadProfile.load('tests/fixtures/dummy_config/load_profiles/fake_curve.csv'), total_consumption: 500, some_other_attribute: 'one')"
+
+    a_participant = participants.replace_value(a_participant, 'some_other_attribute', 'two')
+    assert 'two' in a_participant
+    assert 'one' not in a_participant
+
+    # Try to replace something that was not there
+    with pytest.raises(KeyError):
+        participants.replace_value(a_participant, 'foo', 'bar')
+
+    # Replace the loas profile with a list of values
+    a_participant = participants.replace_value(a_participant, 'load_profile', [1.0]*8760)
+
+    assert '[1.0,' in a_participant
+    assert 'Merit::LoadProfile' not in a_participant

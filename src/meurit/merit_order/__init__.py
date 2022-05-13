@@ -110,17 +110,16 @@ class MeritOrder(Participants):
         '''
         Returns the key, available capacity and marginal costs of the price setting dispatchable
         in a tuple.
-        If none is available, returns an empty tuple.
+        If none is available, returns the last dispatchable.
 
         Only call this after calling calculate at least once
         '''
         for key, available_capacity, marginal_cost in self.dispatchables_at(hour):
+            dispatchable = (key, available_capacity, marginal_cost)
             if available_capacity:
-                return (key, available_capacity, marginal_cost)
-        # else:
-        #     return (key, available_capacity, marginal_cost)
-        # TODO return last one if none was found
-        return ()
+                break
+
+        return dispatchable
 
     def inject_curve(self, interconnector_key, curve_values, curve_type='availability'):
         '''
